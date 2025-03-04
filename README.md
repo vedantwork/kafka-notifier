@@ -22,8 +22,6 @@ This system consists of two main components:
 
 Each component ensures that Kafka topics exist before producing or consuming messages. The messages are serialized as JSON before publishing.
 
-![Kafka Workflow](https://upload.wikimedia.org/wikipedia/commons/0/05/Apache_kafka.svg)
-
 ---
 
 ## 📂 Project Structure
