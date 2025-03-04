@@ -12,6 +12,7 @@ This project implements a Kafka-based notification system using Python with `con
 5. 🛠 [Kafka Topic Management](#-kafka-topic-management)
 6. ▶️ [How to Run](#-how-to-run)
 7. ⚠️ [Error Handling](#-error-handling)
+8. 🔗 [Download & Setup Links](#-download--setup-links)
 
 ---
 
@@ -22,16 +23,19 @@ This system consists of two main components:
 
 Each component ensures that Kafka topics exist before producing or consuming messages. The messages are serialized as JSON before publishing.
 
+![Kafka Workflow](https://upload.wikimedia.org/wikipedia/commons/0/05/Apache_kafka.svg)
+
 ---
 
 ## 📂 Project Structure
 ```
 project/
-│── kafka_service.py  # Defines the Kafka Producer
-│── consumer.py       # Defines the Kafka Consumer
-│── .env              # Environment variables
-│── config.py         # Configuration settings
-│── README.md         # Documentation
+│── publish_to_kafka.py  # Defines code to publish the payload
+│── kafka_service.py     # Defines the Kafka Producer
+│── consumer.py          # Defines the Kafka Consumer
+│── .env                 # Environment variables
+│── config.py            # Configuration settings
+│── README.md            # Documentation
 ```
 
 ---
@@ -100,28 +104,42 @@ Both producer and consumer include the **`ensure_kafka_topic()`** function to:
 Ensure that Kafka is installed and running.
 
 ```sh
-# Start Zookeeper
-zookeeper-server-start.sh config/zookeeper.properties
+# Start Zookeeper in a new terminal
+bin/zookeeper-server-start.sh config/zookeeper.properties
 
-# Start Kafka Broker
-kafka-server-start.sh config/server.properties
+# Start Kafka Broker in another terminal
+bin/kafka-server-start.sh config/server.properties
 ```
 
 ### 🔧 2. Configure Environment Variables
 Create a `.env` file and set the following variables:
 ```env
 KAFKA_BOOTSTRAP_SERVERS=localhost:9092
-TOPIC_NAME=my_topic
+TOPIC_NAME=notifications
 ```
 
-### 🔧 3. Run the Kafka Producer
+### 🔧 3. Manage Kafka Topics
+```sh
+# Delete an existing topic
+bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
+
+# Create a new topic
+bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+```
+
+### 🔧 4. Run the Kafka Producer
 ```sh
 python kafka_service.py
 ```
 
-### 🔧 4. Run the Kafka Consumer
+### 🔧 5. Run the Kafka Consumer
 ```sh
 python consumer.py
+```
+
+### 🔧 6. Consume Messages from Kafka Console
+```sh
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic notifications --from-beginning
 ```
 
 ---
@@ -134,6 +152,17 @@ python consumer.py
 2. **Consumer Errors**:
    - ❌ If message processing fails, it is logged and offset is not committed.
    - ⚙️ Kafka errors are logged and handled appropriately.
+
+---
+
+## 🔗 Download & Setup Links
+1. **Download Apache Kafka**: [Kafka Official Download](https://kafka.apache.org/downloads)
+2. **Install Java (Required for Kafka)**: [Download Java](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+3. **Install Python Dependencies**:
+   ```sh
+   pip install confluent-kafka python-dotenv
+   ```
+4. **Kafka Documentation**: [Kafka Official Docs](https://kafka.apache.org/documentation/)
 
 ---
 
