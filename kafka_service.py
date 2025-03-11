@@ -15,11 +15,14 @@ topic = settings.kafka_trigger_topic
 
 
 def publish_to_kafka(payload):
-    """Publishes a message to Kafka."""
-    ensure_kafka_topic(settings.kafka_trigger_topic)
-    serialized_payload = json.dumps(payload)
-    producer.produce(topic, serialized_payload, callback=acked)
-    producer.flush()
+    """Publishes a message to Kafka with proper logging."""
+    ensure_kafka_topic(topic)
+    try:
+        serialized_payload = json.dumps(payload)
+        producer.produce(topic, serialized_payload, callback=acked)
+        producer.poll(1)  # Allow the producer to process delivery reports asynchronously
+    except Exception as e:
+        logging.error(f"Error producing Kafka message: {e}", exc_info=True)
 
 
 def ensure_kafka_topic(topic_name, num_partitions=1, replication_factor=1):
